@@ -1,6 +1,6 @@
 require('dotenv').config();
 const bcrypt = require('bcrypt');
-const { User, addUser, findUser } = require('./usermanager.js');
+const { User, addUser, findUser, modifyUser } = require('./usermanager.js');
 const { validationResult } = require('express-validator');
 const userdbPath = '../db/users';
 const jwt = require('jsonwebtoken');
@@ -30,4 +30,37 @@ const loginUser = (req, res) => {
   }
 };
 
-module.exports = { registerUser, loginUser }; 
+const verifyUser = (req, res, next) =>{
+  try {
+    validationResult(req).throw();
+    let payload = '';
+    jwt.verify(req.headers.authorization, process.env.JWT_SECRET, (err, decoded) => {
+      if (err)
+        res.status(403).send({error: 'Invalid Token ' + err.message });
+      payload = decoded;
+    });
+    req.user = findUser(payload.email, userdbPath);
+    next();
+  } catch(err){
+    res.status(400).send({error: err.message || validationResult(req).array()});
+  }
+};
+const getPreferences = (req, res) => {
+  try {
+    res.status(200).send({preferences: req.user.preferences});
+  } catch (err) {
+    res.status(400).send({error: err.message });
+  } 
+};
+
+const putPreferences = (req, res) => {
+  try {
+    // validationReault(req).throw();
+    const preferences = req.body.preferences;
+    const prefs = modifyUser(req.user.email, userdbPath, 'preferences', preferences);
+    res.status(200).send({message: `Modified preferences of ${req.user.email}`}); 
+  } catch (err) {
+    res.status(400).send({error: err.message || validationResult(req).array()});
+  }
+}
+module.exports = { registerUser, loginUser, verifyUser, getPreferences, putPreferences }; 

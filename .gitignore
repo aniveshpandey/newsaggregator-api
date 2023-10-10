@@ -1,3 +1,5 @@
 plan.txt
 
 node_modules/
+
+src/.env

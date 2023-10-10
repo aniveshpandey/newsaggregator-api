@@ -3,7 +3,7 @@ const express = require('express');
 const { checkSchema, body } = require('express-validator');
 const app = express();
 const { userSchema } = require('./schema.js');
-const { registerUser, loginUser } = require('./userController.js');
+const { registerUser, loginUser, verifyUser, getPreferences, putPreferences } = require('./userController.js');
 app.use(express.json());
 
 
@@ -12,8 +12,8 @@ app.get('/', (req,res) =>{
 });
 app.post('/register', checkSchema(userSchema), registerUser );
 app.post('/login', checkSchema(userSchema), loginUser);
-// app.get('/preferences');
-// app.put('/preferences');
+app.get('/preferences',verifyUser, getPreferences );
+app.put('/preferences', verifyUser, putPreferences );
 // app.get('/news');
 
 app.listen(PORT, () => {

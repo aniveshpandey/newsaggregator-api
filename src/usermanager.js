@@ -65,4 +65,24 @@ const findUser = (email, path) => {
   }
 }
 
-module.exports = {User, addUser, findUser};
+const modifyUser = (email, path, prop, value) => {
+  try {
+    const userdb = readUsers(path);
+    for (const user of userdb){
+      if (user.email === email) {
+        user.dateModified = Date.now();
+        if (!Object.hasOwn(user, prop))
+          throw new Error ('User does not have that property');
+        user[prop] = value;
+        writeUsers(path, userdb);
+        return user.prop;
+      }
+    }
+    throw new Error('User Not Found');
+  } catch(err){
+    console.log('Error trying to find user');
+    throw err;
+  }
+}
+
+module.exports = {User, addUser, findUser, modifyUser};
