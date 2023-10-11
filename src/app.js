@@ -14,7 +14,7 @@ app.post('/register', checkSchema(userSchema), registerUser );
 app.post('/login', checkSchema(userSchema), loginUser);
 app.get('/preferences',verifyUser, getPreferences );
 app.put('/preferences', verifyUser, putPreferences );
-// app.get('/news');
+app.get('/news', verifyUser, getNewsByPreference);
 
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);
