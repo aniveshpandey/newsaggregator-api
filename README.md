@@ -37,7 +37,7 @@ Before using the News Aggregator API, make sure you have the following software 
     npm start
     ```
 
-###Endpoints
+### Endpoints
 
     - GET /:
         Returns a welcome message indicating that the API is up and running.
@@ -72,7 +72,7 @@ Before using the News Aggregator API, make sure you have the following software 
     - GET /news/search/:keyword:
         Search for news articles containing a specific keyword.
 
-###Contributing
+### Contributing
 
 If you'd like to contribute to this project, please follow these steps:
 
@@ -82,6 +82,6 @@ If you'd like to contribute to this project, please follow these steps:
 4. Test your changes.
 5. Submit a pull request.
 
-###License
+### License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
