@@ -2,13 +2,12 @@
 require('dotenv').config();
 const axios = require('axios');
 const apiKey = process.env.NEWS_API_KEY;
-const fetchInterval = 120000;
 
-const fetchNewsbyPreferences = async function(prefs, key, cache, nextPage)   {
+const fetchNewsbyParams = async function(params, key, cache, nextPage)   {
   try {
-  prefs.apiKey = key;       //Adding the api key to the object passed as params
-  if(nextPage) prefs.page = nextPage;
-  const response = await axios.get("https://newsdata.io/api/1/news",{params: prefs});
+  params.apiKey = key;       //Adding the api key to the object passed as params
+  if(nextPage) params.page = nextPage;
+  const response = await axios.get("https://newsdata.io/api/1/news",{params: params});
   cache.push(...response.data.results);
   nextPage = response.data.nextPage;
   return nextPage;
@@ -23,19 +22,34 @@ const fetchNewsbyPreferences = async function(prefs, key, cache, nextPage)   {
 // }
 // main();
 //
-async function initCache(cache, prefs, maxPage) {
+async function initCache(cache, prefs, interval, maxPage) {
   try {
     let pageCount = 1;
-    let newPage = await fetchNewsbyPreferences(prefs, apiKey, cache);
+    let newPage = await fetchNewsbyParams(prefs, apiKey, cache);
     let intervalId = setInterval(async () => {
       if (!pageCount == maxPage){
-        newPage = await fetchNewsbyPreferences(prefs, apiKey, cache, newPage); 
+        newPage = await fetchNewsbyParams(prefs, apiKey, cache, newPage); 
         pageCount++;
       }else 
       clearInterval(intervalId);
     },fetchInterval);
   } catch (err){
     console.error(err.message + "cannot initialize Cache");
+  }
+}
+
+const flushCache = (cache, interval, elements) => {
+  try {
+    const intervalId = setInterval( () => {
+      for (let i = 0; i < elements; i++){
+        cache.shift();
+      }
+      if (!cache) 
+        clearInterval(intervalId);
+    } , interval);
+  } catch (err) {
+    console.error(err.message);
+    throw err;
   }
 }
 
@@ -59,8 +73,8 @@ const getNewsByPreferences = (prefs, cache) => {
       newsArray.push(news);
     }, []);
     if(!preferredNews) {
-    initCache (cache, prefs, 5);
-    preferredNews = getNewsByPreference(prefs, cache);
+      initCache (cache, prefs, 5);
+      preferredNews = getNewsByPreference(prefs, cache);
     }
     else return preferredNews;
   } catch (err) {
@@ -69,4 +83,4 @@ const getNewsByPreferences = (prefs, cache) => {
   }
 };
 
-module.exports = {initCache, getNewsById, getNewsByPreferences};
+module.exports = { fetchNewsbyParams, initCache, flushCache, getNewsById, getNewsByPreferences };

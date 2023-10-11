@@ -4,7 +4,7 @@ const { checkSchema, body } = require('express-validator');
 const app = express();
 const { userSchema } = require('./schema.js');
 const { registerUser, loginUser, verifyUser, getPreferences, putPreferences ,updateUserReadNews, updateUserFavoriteNews } = require('./userController.js');
-const { getUserNews, getReadNews, getFavoriteNews} = require('./newsController.js');
+const { getUserNews, getReadNews, getFavoriteNews, searchNews} = require('./newsController.js');
 app.use(express.json());
 
 
@@ -21,6 +21,8 @@ app.get('/news/read', verifyUser, getReadNews);
 app.get('/news/favorite', verifyUser, getFavoriteNews);
 app.post('/news/:id/read', verifyUser, updateUserReadNews);
 app.post('/news/:id/favorite', verifyUser, updateUserFavoriteNews);
+
+app.get('/news/search/:keyword', searchNews);
 
 app.listen(PORT, () => {
   console.log(`App listening at port ${PORT}`);

@@ -2,8 +2,11 @@
 require('dotenv').config();
 const apiKey = process.env.NEWS_API_KEY;
 const maxPage = eval(process.env.MAX_CACHE_PAGE);
+const fetchInterval = eval(process.env.CACHE_FETCH_INTERVAL);
+const flushInterval = eval(precess.env.CACHE_FLUSH_INTERVAL);
+const flushElements = eval(process.env.CACHE_FLUSH_ELEMENTS);
 const { validationResult } = require('express-validator');
-const { initCache, getNewsById, getNewsByPreferences } = require('./newscache.js');
+const { initCache, flushCache, getNewsById, getNewsByPreferences, fetchNewsbyParams } = require('./newscache.js');
 const { modifyUser } = require('./usermanager.js');
 
 const globalPrefs = {
@@ -13,7 +16,8 @@ const globalPrefs = {
 };
 
 const newsCache = [];
-initCache(newsCache, globalPrefs, maxPage);
+initCache(newsCache, globalPrefs, fetchInterval, maxPage);
+flushCache(newsCache, flushInterval, flushElements);
 
 const getUserNews = (req, res) => {
   try { 
@@ -53,4 +57,14 @@ const getFavoriteNews = (req, res) => {
   }
 };
 
-module.exports = { getUserNews, getReadNews, getFavoriteNews};
+const searchNews = (req, res) => {
+  try {
+    const newsArray = [];
+    fetchNewsbyParams(req.params.keyword, apiKey, newsArray);  
+    res.status(200).send(newsArray);  
+  } catch(err) {
+    res.status(400).send({error: err.message});
+  }
+}
+
+module.exports = { getUserNews, getReadNews, getFavoriteNews, searchNews};
