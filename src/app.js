@@ -1,10 +1,11 @@
-const PORT = 3000;
+require('dotenv').config('../.env');
+const PORT = eval(process.env.PORT);
 const express = require('express');
 const { checkSchema, body } = require('express-validator');
 const app = express();
-const { userSchema } = require('./schema.js');
-const { registerUser, loginUser, verifyUser, getPreferences, putPreferences ,updateUserReadNews, updateUserFavoriteNews } = require('./userController.js');
-const { getUserNews, getReadNews, getFavoriteNews, searchNews} = require('./newsController.js');
+const { userSchema } = require('./etc/schema.js');
+const { registerUser, loginUser, verifyUser, getPreferences, putPreferences ,updateUserReadNews, updateUserFavoriteNews } = require('./user/user-controller.js');
+const { getUserNews, getReadNews, getFavoriteNews, searchNews} = require('./news/news-controller.js');
 app.use(express.json());
 
 

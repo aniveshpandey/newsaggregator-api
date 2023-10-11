@@ -5,3 +5,5 @@ node_modules/
 src/.env
 
 db/users
+
+testscript.sh

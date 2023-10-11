@@ -1,4 +1,4 @@
-const { readUsers, writeUsers } = require("./userFileHelper");
+const { readUsers, writeUsers } = require("../etc/userFileHelper.js");
 
 class User {
   constructor (email, password, privilege = 'normal') {

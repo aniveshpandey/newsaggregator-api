@@ -1,13 +1,13 @@
 'use strict';
-require('dotenv').config();
+require('dotenv').config('../../.env');
 const apiKey = process.env.NEWS_API_KEY;
 const maxPage = eval(process.env.MAX_CACHE_PAGE);
 const fetchInterval = eval(process.env.CACHE_FETCH_INTERVAL);
 const flushInterval = eval(precess.env.CACHE_FLUSH_INTERVAL);
 const flushElements = eval(process.env.CACHE_FLUSH_ELEMENTS);
 const { validationResult } = require('express-validator');
-const { initCache, flushCache, getNewsById, getNewsByPreferences, fetchNewsbyParams } = require('./newscache.js');
-const { modifyUser } = require('./usermanager.js');
+const { initCache, flushCache, getNewsById, getNewsByPreferences, fetchNewsbyParams } = require('./news-cachemanager.js');
+const { modifyUser } = require('../user/usermanager.js');
 
 const globalPrefs = {
   country: 'in,us,ru',

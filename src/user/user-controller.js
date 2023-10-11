@@ -1,8 +1,10 @@
-require('dotenv').config();
+require('dotenv').config('../../.env');
+const jwtExpiry = eval(process.env.JWT_EXPIRY);
+const jwtSecret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
-const { User, addUser, findUser, modifyUser } = require('./usermanager.js');
+const { User, addUser, findUser, modifyUser } = require('./user-msnager.js');
 const { validationResult } = require('express-validator');
-const userdbPath = '../db/users';
+const userdbPath = '../../db/users';
 const jwt = require('jsonwebtoken');
 
 const registerUser = (req, res) => {
@@ -23,7 +25,7 @@ const loginUser = (req, res) => {
     const token = jwt.sign({
     email: user.email, 
     dateCreated: user.dateCreated 
-    }, process.env.JWT_SECRET, { expiresIn: '1h' } );
+    }, jwtSecret, { expiresIn: jwtExpiry } );
     res.status(200).send({message: 'SignIn successful', accessToken: token });
   }catch(err){
     res.status(400).send({error: err.message || validationResult(req)});
