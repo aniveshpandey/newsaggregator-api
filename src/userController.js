@@ -45,6 +45,7 @@ const verifyUser = (req, res, next) =>{
     res.status(400).send({error: err.message || validationResult(req).array()});
   }
 };
+
 const getPreferences = (req, res) => {
   try {
     res.status(200).send({preferences: req.user.preferences});
@@ -63,4 +64,27 @@ const putPreferences = (req, res) => {
     res.status(400).send({error: err.message || validationResult(req).array()});
   }
 }
-module.exports = { registerUser, loginUser, verifyUser, getPreferences, putPreferences }; 
+
+const updateUserReadNews = (req, res) => {
+  try {
+    const readId = req.params.id;
+    req.user.read.push(readId);
+    const readNews = modifyUser(req.user.email, userdb, 'read', req.user.read);
+    res.status(200).send({read: readNews});
+  } catch(err) {
+    res.status(400).send({error: err.message});
+  }
+};
+const updateUserFavoriteNews = (req, res) => {
+  try {
+    const favoriteId = req.params.id;
+    req.user.favorite.push(favoriteId);
+    const favoriteNews = modifyUser(req.user.email, userdb, 'favorite', req.user.favorite);
+    res.status(200).send({read: favoriteNews});
+  } catch(err) {
+    res.status(400).send({error: err.message});
+  }
+};
+
+
+module.exports = { registerUser, loginUser, verifyUser, getPreferences, putPreferences, updateUserReadNews, updateUserFavoriteNews }; 

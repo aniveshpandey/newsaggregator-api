@@ -7,6 +7,8 @@ class User {
     this.privilege = privilege;
     this.preferences = {};
     this.dateCreated = new Date();
+    this.read = [];
+    this.favorite = [];
   }
   set privilege(val) {
     switch (val){
