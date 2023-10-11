@@ -23,21 +23,13 @@ const fetchNewsbyPreferences = async function(prefs, key, cache, nextPage)   {
 // }
 // main();
 //
-const globalPrefs = {
-  country: 'in',
-  language: 'en,hi,bn,mr,ta',
-  category: 'business,politics,science,technology,sports',
-};
-
-const newsCacheL1 = [];
-
-async function initCache(cache, maxPage) {
+async function initCache(cache, prefs, maxPage) {
   try {
     let pageCount = 1;
-    let newPage = await fetchNewsbyPreferences(globalPrefs, apiKey, cache);
+    let newPage = await fetchNewsbyPreferences(prefs, apiKey, cache);
     let intervalId = setInterval(async () => {
       if (!pageCount == maxPage){
-        newPage = await fetchNewsbyPreferences(globalPrefs, apiKey,cache, cache); 
+        newPage = await fetchNewsbyPreferences(prefs, apiKey, cache, newPage); 
         pageCount++;
       }else 
       clearInterval(intervalId);
@@ -47,14 +39,34 @@ async function initCache(cache, maxPage) {
   }
 }
 
-initCache(newsCacheL1, 15);
-
 const getNewsById = (cache, id) => {
   const news = cache.forEach(news => news.article_id ===id);
   if (!news) throw new Error(`News with id ${id} does not exist`);
   return news;
 }
 
-// const getNewsByPreference = (
+const getNewsByPreferences = (prefs, cache) => {
+  try {
+    const category = prefs.category.split(',');
+    const country = prefs.country.split(',');
+    const language = prefs.language.split(',');
+    const keywords = prefs.keywords.split(',');
+    const preferredNews = cache.reduce((newsArray, news) => {
+     if(category.includes(news.category) ||
+        country.includes(news.country) ||
+        language.includes (news.language) ||
+        keywords.includes (news.keywords))
+      newsArray.push(news);
+    }, []);
+    if(!preferredNews) {
+    initCache (cache, prefs, 5);
+    preferredNews = getNewsByPreference(prefs, cache);
+    }
+    else return preferredNews;
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+};
 
-// ) => {};
+module.exports = {initCache, getNewsById, getNewsByPreferences};
