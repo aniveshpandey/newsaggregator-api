@@ -72,10 +72,10 @@ const modifyUser = (email, path, prop, value) => {
     const userdb = readUsers(path);
     for (const user of userdb){
       if (user.email === email) {
-        user.dateModified = Date.now();
         if (!Object.hasOwn(user, prop))
           throw new Error ('User does not have that property');
         user[prop] = value;
+        user.dateModified = Date.now();
         writeUsers(path, userdb);
         return user.prop;
       }

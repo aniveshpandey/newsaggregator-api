@@ -4,8 +4,7 @@
   "description": "A RESTful API that allows users to fetch news articles from multiple sources based on their preferences",
   "main": "src/app.js",
   "scripts": {
-    "start": "node src/app.js",
-    "kill-duplicate": "sh src/etc/killzombie.sh",
+    "start": "sh src/etc/start.sh",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -23,12 +23,16 @@ const loginUser = (req, res) => {
   try{
     validationResult(req).throw();
     const user = findUser(req.body.email, userdbPath);
-    const token = jwt.sign({
-    email: user.email, 
-    dateCreated: user.dateCreated 
-    }, jwtSecret, { expiresIn: jwtExpiry } );
-    res.status(200).send({message: 'SignIn successful', accessToken: token });
-  }catch(err){
+    if(!bcrypt.compareSync(req.body.password, user.password))
+      res.status(401).send({error: "Invalid Password"});
+    else {
+      const token = jwt.sign({
+        email: user.email, 
+        dateCreated: user.dateCreated 
+      }, jwtSecret, { expiresIn: jwtExpiry } );
+      res.status(200).send({message: 'SignIn successful', accessToken: token });
+    }
+      }catch(err){
     res.status(400).send({error: err.message || validationResult(req)});
   }
 };

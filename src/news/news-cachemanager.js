@@ -2,12 +2,13 @@
 require('dotenv').config('../../.env');
 const axios = require('axios');
 const apiKey = process.env.NEWS_API_KEY;
+const newsURL = process.env.NEWS_URL;
 
 const fetchNewsbyParams = async function(params, key, cache, nextPage)   {
   try {
   params.apiKey = key;       //Adding the api key to the object passed as params
   if(nextPage) params.page = nextPage;
-  const response = await axios.get("https://newsdata.io/api/1/news",{params: params});
+  const response = await axios.get(newsURL ,{params: params});
   cache.push(...response.data.results);
   nextPage = response.data.nextPage;
   return nextPage;
