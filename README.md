@@ -37,42 +37,42 @@ Before using the News Aggregator API, make sure you have the following software 
     npm start
     ```
 
-###Endpoints
+### Endpoints
 
-    - GET /:
+    GET /:
         Returns a welcome message indicating that the API is up and running.
 
-    - POST /register:
+    POST /register:
         Register a new user using user schema validation.
 
-    - POST /login:
+    POST /login:
         Authenticate a user using user schema validation.
 
-    - GET /preferences:
+    GET /preferences:
         Get user preferences after user authentication.
 
-    - PUT /preferences:
+    PUT /preferences:
         Update user preferences after user authentication.
 
-    - GET /news:
+    GET /news:
         Retrieve user-specific news articles.
 
-    - GET /news/read:
+    GET /news/read:
         Retrieve news articles marked as read by the user.
 
-    - GET /news/favorite:
+    GET /news/favorite:
         Retrieve news articles marked as favorites by the user.
 
-    - POST /news/:id/read:
+    POST /news/:id/read:
         Mark a news article as read for the user.
 
-    - POST /news/:id/favorite:
+    POST /news/:id/favorite:
         Mark a news article as a favorite for the user.
 
-    - GET /news/search/:keyword:
+    GET /news/search/:keyword:
         Search for news articles containing a specific keyword.
 
-###Contributing
+### Contributing
 
 If you'd like to contribute to this project, please follow these steps:
 
@@ -82,6 +82,6 @@ If you'd like to contribute to this project, please follow these steps:
 4. Test your changes.
 5. Submit a pull request.
 
-###License
+### License
 
 This project is licensed under the MIT License - see the LICENSE file for details.
