@@ -38,15 +38,15 @@ Before using the News Aggregator API, make sure you have the following software 
 
 ### Endpoints
 
-    GET /:
-        Returns a welcome message indicating that the API is up and running.
+GET /:
+     Returns a welcome message indicating that the API is up and running.
 
 
  ```bash
      curl http://localhost:<PORT>/
  ```
 
-    POST /register:
+POST /register:
        Register a new user using user schema validation.
 
  ```bash
@@ -54,7 +54,7 @@ Before using the News Aggregator API, make sure you have the following software 
     "privilege": "normal"}' http://localhost:<PORT>/register/
  ```
 
-    POST /login:
+POST /login:
         Authenticate a user using user schema validation.
 
 ```bash
@@ -62,14 +62,14 @@ Before using the News Aggregator API, make sure you have the following software 
      http://localhost:<PORT>/login/
 ```
 
-    GET /preferences:
+ GET /preferences:
         Get user preferences after user authentication.
 
 ```bash
      curl -H "Authorization : <token>" http://localhost:<PORT>/preferences/
  ```
 
-    PUT /preferences:
+PUT /preferences:
         Update user preferences after user authentication.
 
 ```bash
@@ -78,42 +78,42 @@ Before using the News Aggregator API, make sure you have the following software 
     }}' http://localhost:<PORT>/preferences/
 ```
 
-    GET /news:
+GET /news:
         Retrieve user-specific news articles.
 
 ```bash
     curl -H "Authorization : <token>" http://localhost:<PORT>/news/
  ```
         
-    GET /news/read:
+GET /news/read:
         Retrieve news articles marked as read by the user.
 
 ```bash
      curl -H "Authorization : <token>" http://localhost:<PORT>/news/read/
  ```
  
-    GET /news/favorite:
+GET /news/favorite:
         Retrieve news articles marked as favorites by the user.
 
  ```bash
      curl -H "Authorization : <token>" http://localhost:<PORT>/news/favorite/
 ```
  
-    POST /news/:id/read:
+POST /news/:id/read:
         Mark a news article as read for the user.
 
 ```bash
      curl -X POST -H "Authorization : <token>" http://localhost:<PORT>/news/:id/read/
 ```
  
-    POST /news/:id/favorite:
+POST /news/:id/favorite:
         Mark a news article as a favorite for the user.
 
 ```bash
     curl -X POST -H "Authorization : <token>" http://localhost:<PORT>/news/:id/favorite/
 ```
  
-    GET /news/search/:keyword:
+GET /news/search/:keyword:
         Search for news articles containing a specific keyword.
 
 ```bash
