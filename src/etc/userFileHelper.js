@@ -1,5 +1,7 @@
 const fs = require('fs');
-// const {User} = require('./usermanager.js');
+// const {User} = require('../user/user-manager.js');
+const path = require('path');
+const filePath = path.join(__dirname, '../../db/users');
 
 const readUsers = function (path){
   try {
@@ -20,23 +22,18 @@ const writeUsers = function (path, userSet) {
 
 module.exports = {readUsers, writeUsers};
 
-
-
-// console.log(readData);
-
-//
-// const user1 = new User('Adam', 'asdfjkl;', 'normal');
-// const user2 = new User('Adele', 'asdfjkl;', 'admin');
+// const user1 = new User('Adam@exmaple.com', 'asdfjkl;', 'normal');
+// const user2 = new User('Adele@example.com', 'asdfjkl;', 'admin');
 // // const user3 = new User('Alex', 'asdfjkl;');
 // const userSet = new Set();
 // //
 // userSet.add(user1);
 // userSet.add(user2);
 // //
-// writeUsers('../db/users', userSet);
+// writeUsers(filePath, userSet);
 // //
 // //
-// const fileData1 = readUsers('../db/users');
+// const fileData1 = readUsers(filePath);
 // console.log(fileData1);
 // //
 // userSet.add(user3);

@@ -45,7 +45,7 @@ const addUser = (user, path) => {
         throw new Error(`User with email ${user.email} already exists`);
     } );
     userdb.add(user);
-    console.log(userdb);
+    // console.log(userdb);
     writeUsers(path, userdb);
   } catch(err){
     console.log('Error trying to add new user')

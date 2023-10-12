@@ -2,9 +2,10 @@ require('dotenv').config('../../.env');
 const jwtExpiry = eval(process.env.JWT_EXPIRY);
 const jwtSecret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
-const { User, addUser, findUser, modifyUser } = require('./user-msnager.js');
+const { User, addUser, findUser, modifyUser } = require('./user-manager.js');
 const { validationResult } = require('express-validator');
-const userdbPath = '../../db/users';
+const path = require('path');
+const userdbPath = path.join(__dirname, '../../db/users');
 const jwt = require('jsonwebtoken');
 
 const registerUser = (req, res) => {

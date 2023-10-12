@@ -32,7 +32,7 @@ async function initCache(cache, prefs, interval, maxPage) {
         pageCount++;
       }else 
       clearInterval(intervalId);
-    },fetchInterval);
+    }, interval);
   } catch (err){
     console.error(err.message + "cannot initialize Cache");
   }
