@@ -6,10 +6,12 @@ const newsURL = process.env.NEWS_URL;
 
 const fetchNewsbyParams = async function(params, key, cache, nextPage)   {
   try {
-  params.apiKey = key;       //Adding the api key to the object passed as params
+  params.apikey = key;       //Adding the api key to the object passed as params
   if(nextPage) params.page = nextPage;
+    console.log(cache);
   const response = await axios.get(newsURL ,{params: params});
   cache.push(...response.data.results);
+    console.log(cache);
   nextPage = response.data.nextPage;
   return nextPage;
   } catch(err) {
@@ -17,12 +19,7 @@ const fetchNewsbyParams = async function(params, key, cache, nextPage)   {
     throw err;
   }
 }
-// async function main ()  {
-//   const news = await fetchNewsbyPreferences({country: 'in', language: 'en'}, apiKey, cache);
-//   console.log(news);
-// }
-// main();
-//
+
 async function initCache(cache, prefs, interval, maxPage) {
   try {
     let pageCount = 1;

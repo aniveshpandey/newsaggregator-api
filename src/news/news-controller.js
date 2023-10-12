@@ -57,10 +57,11 @@ const getFavoriteNews = (req, res) => {
   }
 };
 
-const searchNews = (req, res) => {
+const searchNews = async (req, res) => {
   try {
     const newsArray = [];
-    fetchNewsbyParams(req.params.keyword, apiKey, newsArray);  
+    const searchquery = {q: req.params.keyword};
+    const _ = await fetchNewsbyParams(searchquery, apiKey, newsArray);  
     res.status(200).send(newsArray);  
   } catch(err) {
     res.status(400).send({error: err.message});
