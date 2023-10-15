@@ -7,12 +7,16 @@ const { validationResult } = require('express-validator');
 const path = require('path');
 const userdbPath = path.join(__dirname, '../../db/users');
 const jwt = require('jsonwebtoken');
+const EventEmitter = require('events');
+const { EventEmitter } = require('stream');
+const eventEmitter = new EventEmitter();
 
 const registerUser = (req, res) => {
   try {
     validationResult(req).throw();
     const user = new User(req.body.email, bcrypt.hashSync(req.body.password, 8), req.body.privilege);
     addUser(user, userdbPath);
+    eventEmitter.emit('register', user);
     res.status(200).send({message: `User with email ${user.email} added`});
   }catch(err){
     res.status(400).send({error: err.message || validationResult(req).array()});
@@ -30,6 +34,7 @@ const loginUser = (req, res) => {
         email: user.email, 
         dateCreated: user.dateCreated 
       }, jwtSecret, { expiresIn: jwtExpiry } );
+      eventEmitter.emit('login', user);
       res.status(200).send({message: 'SignIn successful', accessToken: token });
     }
       }catch(err){
@@ -55,6 +60,8 @@ const verifyUser = (req, res, next) =>{
 
 const getPreferences = (req, res) => {
   try {
+    if (!req.user.preferences)
+      throw new Error("Empty preferences");
     res.status(200).send({preferences: req.user.preferences});
   } catch (err) {
     res.status(400).send({error: err.message });
@@ -66,6 +73,7 @@ const putPreferences = (req, res) => {
     // validationReault(req).throw();
     const preferences = req.body.preferences;
     const prefs = modifyUser(req.user.email, userdbPath, 'preferences', preferences);
+    eventEmitter.emit('prefsUpdated', prefs);
     res.status(200).send({message: `Modified preferences of ${req.user.email}`}); 
   } catch (err) {
     res.status(400).send({error: err.message || validationResult(req).array()});
@@ -77,6 +85,7 @@ const updateUserReadNews = (req, res) => {
     const readId = req.params.id;
     req.user.read.push(readId);
     const readNews = modifyUser(req.user.email, userdb, 'read', req.user.read);
+    eventEmitter.emit('readUpdated', req.user, readId);
     res.status(200).send({read: readNews});
   } catch(err) {
     res.status(400).send({error: err.message});
@@ -87,6 +96,7 @@ const updateUserFavoriteNews = (req, res) => {
     const favoriteId = req.params.id;
     req.user.favorite.push(favoriteId);
     const favoriteNews = modifyUser(req.user.email, userdb, 'favorite', req.user.favorite);
+    eventEmitter.emit('favoriteUpdated',  req.user, favoriteId);
     res.status(200).send({read: favoriteNews});
   } catch(err) {
     res.status(400).send({error: err.message});
