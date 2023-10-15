@@ -10,6 +10,15 @@ class User {
     this.read = [];
     this.favorite = [];
   }
+  set email(email) {
+    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if(!emailRegex.test(email))
+      throw new Error(`Invalid email ${email}`);
+    this._email = email;
+  }
+  get email() {
+    return this._email;
+  }
   set privilege(val) {
     switch (val){
       case 'normal': {
