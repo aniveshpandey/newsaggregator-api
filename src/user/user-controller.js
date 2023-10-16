@@ -2,7 +2,8 @@ require('dotenv').config('../../.env');
 const jwtExpiry = eval(process.env.JWT_EXPIRY);
 const jwtSecret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
-const { User, addUser, findUser, modifyUser } = require('./user-manager.js');
+const { addUser, findUser, modifyUser } = require('./user-manager.js');
+const { User } = require = ('./user-class.js');
 const { validationResult } = require('express-validator');
 const path = require('path');
 const userdbPath = path.join(__dirname, '../../db/users');
@@ -78,7 +79,7 @@ const putPreferences = (req, res) => {
   } catch (err) {
     res.status(400).send({error: err.message || validationResult(req).array()});
   }
-}
+};
 
 const updateUserReadNews = (req, res) => {
   try {
@@ -91,6 +92,7 @@ const updateUserReadNews = (req, res) => {
     res.status(400).send({error: err.message});
   }
 };
+
 const updateUserFavoriteNews = (req, res) => {
   try {
     const favoriteId = req.params.id;
@@ -102,6 +104,5 @@ const updateUserFavoriteNews = (req, res) => {
     res.status(400).send({error: err.message});
   }
 };
-
 
 module.exports = { registerUser, loginUser, verifyUser, getPreferences, putPreferences, updateUserReadNews, updateUserFavoriteNews }; 

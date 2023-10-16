@@ -1,50 +1,5 @@
 const { readUsers, writeUsers } = require("../etc/userFileHelper.js");
-
-class User {
-  constructor (email, password, privilege = 'normal') {
-    this.email = email;
-    this.password = password;
-    this.privilege = privilege;
-    this.preferences = {};
-    this.dateCreated = new Date();
-    this.read = [];
-    this.favorite = [];
-  }
-  set email(email) {
-    const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    if(!emailRegex.test(email))
-      throw new Error(`Invalid email ${email}`);
-    this._email = email;
-  }
-  get email() {
-    return this._email;
-  }
-  set privilege(val) {
-    switch (val){
-      case 'normal': {
-        this._privilege = 'normal';
-        break;
-      }
-      case 'admin': {
-        this._privilege = 'admin';
-        break;
-      }
-      default:
-        throw new Error('Invalid Privilege');
-    }
-  }
-  get privilege() {
-    return this._privilege;
-  }
-  updatePreferences(prefs){
-    try {
-      this.preferences = prefs;
-    } catch (err) {
-      throw new Error('Error updating preferences');
-    }
-  }
-}
-
+const { User } = require('./user-class.js');
 
 const addUser = (user, path) => {
   try {
@@ -53,7 +8,7 @@ const addUser = (user, path) => {
       if(registeredUser.email === user.email)
         throw new Error(`User with email ${user.email} already exists`);
     } );
-    userdb.add(user);
+    userdb.set(user.email, user);
     // console.log(userdb);
     writeUsers(path, userdb);
   } catch(err){
@@ -65,35 +20,29 @@ const addUser = (user, path) => {
 const findUser = (email, path) => {
   try {
     const userdb = readUsers(path);
-    for (const user of userdb){
-      if (user.email === email)
-        return user;
-    }
-    throw new Error('User Not Found');
+    const user = userdb.get(email);
+    if(!user)
+      throw new Error('User Not Found');
+    return user;
   } catch(err){
     console.log('Error trying to find user');
     throw err;
   }
-}
+};
 
 const modifyUser = (email, path, prop, value) => {
   try {
     const userdb = readUsers(path);
-    for (const user of userdb){
-      if (user.email === email) {
-        if (!Object.hasOwn(user, prop))
-          throw new Error ('User does not have that property');
-        user[prop] = value;
-        user.dateModified = Date.now();
-        writeUsers(path, userdb);
-        return user.prop;
-      }
-    }
-    throw new Error('User Not Found');
+    const user = findUser(email, path);
+    if (!Object.hasOwn(user, prop))
+       throw new Error ('User does not have that property');
+    user[prop] = value;
+    user.dateModified = Date.now();
+    writeUsers(path, userdb);
+    return user.prop;
   } catch(err){
-    console.log('Error trying to find user');
-    throw err;
+    throw new Error(`Error modifying property of ${user} : ${err.message}`);
   }
-}
+};
 
 module.exports = {User, addUser, findUser, modifyUser};
