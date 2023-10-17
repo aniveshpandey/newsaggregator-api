@@ -6,7 +6,7 @@ const newsURL = process.env.NEWS_URL;
 
 const fetchNewsbyParams = async function(params, key, cache, nextPage)   {
   try {
-  params.apikey = key;       //Adding the api key to the object passed as params
+  params.apiKey = key;       //Adding the api key to the object passed as params
   if(nextPage) params.page = nextPage;
     console.log(cache);
   const response = await axios.get(newsURL ,{params: params});
