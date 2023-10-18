@@ -1,8 +1,8 @@
-const EventEmitter = require('events');
-const eventEmitter = new EventEmitter();
 const crypto = require('crypto');
 const axios = require('axios');
 const { Article } = require('./article-class.js');
+const { readNews, writeNews } = require('../etc/fileHelper.js');
+const eventEmitter = require('events')();
 
 const globalPreferences = {};
 
@@ -20,7 +20,6 @@ const _updateGlobalPreferences = (prefs) => {
   }
 }
 
-
 const _queryFromPrefs = (prefs, key, page) => {
   const query = '';
   for (let prop in prefs){
@@ -34,8 +33,7 @@ const _queryFromPrefs = (prefs, key, page) => {
 };
 
 const _fetchDataFromAPI = async (prefs, key, url, maxPage) => {
-  try{
-    const dataArray = [];
+  try{ const dataArray = [];
     for (let i = 1 ; i <= maxPage; i++){
       const query = _queryFromPrefs(prefs, key, i);
       const data = await axios.get(url, { params: query });
@@ -56,7 +54,7 @@ const _populateCache = (cache, prefs, key, url, maxPage) => {
     const data = _fetchDataFromAPI(prefs, key, url, maxPage);
     data.forEach(article => {
     const newsArticle = new Article(article);
-    const cacheKey = { id: crypto.randomUUID() , fetchedAt:  newsArticle.fetchedAt };
+    const cacheKey = { id: crypto.randomUUID(), fetchedAt:  newsArticle.fetchedAt };
     cache.set(cacheKey, newsArticle);
   });
   } catch (err){
@@ -67,11 +65,11 @@ const _populateCache = (cache, prefs, key, url, maxPage) => {
 
 const _flushCache = (cache, expiryDuration) => {
   try {
-    for (let [key, value] in cache){
+    cache.forEach(  (val, key)  => {
       const timeDifference = new Date() - key.fetchedAt;
       if(timeDifference > expiryDuration)
         cache.delete(key);
-    }
+    });
   } catch(err) {
     console.log("Error flushing cache" + err.message);
     throw err;
@@ -97,5 +95,32 @@ const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDurati
   }
 };
 
-module.exports = { initGlobalCache };
+const _filterCacheByKeyword = (word, cache, map) => {
+  for (let [key, article] in cache){
+    if(article.has(word))
+      map.set(key, article);
+  }
+};
 
+const _populateUserCache = (user, globalCache, userCache) => {
+  try {
+    const keywords = user.preference.q;
+    keywords.forEach(word => {
+      filterCacheByKeyword(word, globalCache, userCache);
+    });
+  } catch(err) {
+    console.log('Error populating user cache' + err.message);
+    throw err;
+  }
+  };
+
+const _flushUserCache = (cache) => {
+  try{
+    delete cache;
+  } catch (err) {
+    console.log('Error flushing user cache' + err.message );
+    throw err;
+  }
+}
+
+module.exports = { initGlobalCache };

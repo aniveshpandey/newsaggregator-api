@@ -14,6 +14,12 @@ class Article {
   read () {
     this.lastRead = new Date();
   }
+  
+  static has(word){
+    return (this.title.toLowerCase().includes(word) ||
+      this.description.toLowerCase().includes(word) ||
+      this.content.toLowerCase().includes(word))
+  }
 }
 
 module.exports = { Article };
