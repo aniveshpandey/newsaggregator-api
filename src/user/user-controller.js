@@ -74,7 +74,7 @@ const putPreferences = (req, res) => {
     // validationReault(req).throw();
     const preferences = req.body.preferences;
     const prefs = modifyUser(req.user.email, userdbPath, 'preferences', preferences);
-    eventEmitter.emit('prefsUpdated', prefs);
+    eventEmitter.emit('userPrefsUpdated', prefs);
     res.status(200).send({message: `Modified preferences of ${req.user.email}`}); 
   } catch (err) {
     res.status(400).send({error: err.message || validationResult(req).array()});

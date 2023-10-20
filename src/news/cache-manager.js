@@ -1,24 +1,10 @@
+'use strict';
 const crypto = require('crypto');
 const axios = require('axios');
+const { globalPreferences, updateGlobalPreferences } = require('./global-preferences.js');
 const { Article } = require('./article-class.js');
-const { readNews, writeNews } = require('../etc/fileHelper.js');
-const eventEmitter = require('events')();
-
-const globalPreferences = {};
-
-const _updateGlobalPreferences = (prefs) => {
-  try{
-  for (let prop in prefs){
-    if (!globalPreferences[prop])
-      globalPreferences[prop] = [];
-    globalpreferences[prop].push(prefs[prop]); 
-  }
-  eventEmitter.emit('globalPrefsUpdated', globalPreferences);
-  } catch(err){
-    console.error('Error updating globalPreferences' + err.message);
-    throw err;
-  }
-}
+const EventEmitter = require('events');
+const eventEmitter = new EventEmitter();
 
 const _queryFromPrefs = (prefs, key, page) => {
   const query = '';
@@ -65,32 +51,13 @@ const _populateCache = (cache, prefs, key, url, maxPage) => {
 
 const _flushCache = (cache, expiryDuration) => {
   try {
-    cache.forEach(  (val, key)  => {
+    cache.forEach(  (_, key)  => {
       const timeDifference = new Date() - key.fetchedAt;
       if(timeDifference > expiryDuration)
         cache.delete(key);
     });
   } catch(err) {
     console.log("Error flushing cache" + err.message);
-    throw err;
-  }
-};
-
-const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDuration) => {
-  try{
-  let globalPrefs = {};
-  eventEmitter.on('userPrefsUpdated', _updateGlobalPreferences);
-  eventEmitter.on('globalPrefsUpdated', (globalPreferences) => {
-    globalPrefs = globalPreferences;
-  });
-  _populateCache(cache, globalPrefs, key, url, maxPage);
-  eventEmitter.emit('globalCacheInitialized', cache);
-  setInterval (() => {
-    _flushCache(cache, expiryDuration);
-    _populateCache(cache, globalPrefs, key, url, maxPage);
-  }, refreshInterval);
-  } catch (err) {
-    console.log('Error initializing Global Cache' + err.message);
     throw err;
   }
 };
@@ -106,7 +73,7 @@ const _populateUserCache = (user, globalCache, userCache) => {
   try {
     const keywords = user.preference.q;
     keywords.forEach(word => {
-      filterCacheByKeyword(word, globalCache, userCache);
+      _filterCacheByKeyword(word, globalCache, userCache);
     });
   } catch(err) {
     console.log('Error populating user cache' + err.message);
@@ -114,13 +81,91 @@ const _populateUserCache = (user, globalCache, userCache) => {
   }
   };
 
-const _flushUserCache = (cache) => {
+const _getNewsById = (id, cache) => {
+  try {
+    cache.forEach( (article, key) => {
+      if(key.id == id)
+        return article;
+    });
+    throw new Error ("Article with id not found");
+  } catch(err) {
+    console.log("error finding news article by id" + err.message);
+    throw err;
+  }
+};
+
+const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDuration) => {
   try{
-    delete cache;
+  let globalPrefs = {};
+  eventEmitter.on('userPrefsUpdated', updateGlobalPreferences);
+  eventEmitter.on('globalPrefsUpdated', (globalPreferences) => {
+    globalPrefs = globalPreferences;
+  });
+  _populateCache(cache, globalPrefs, key, url, maxPage);
+  eventEmitter.emit('globalCacheInitialized', cache);
+  setInterval (() => {
+    _flushCache(cache, expiryDuration);
+    _populateCache(cache, globalPrefs, key, url, maxPage);
+  }, refreshInterval);
+  } catch (err) {
+    console.log('Error initializing Global Cache' + err.message);
+    throw err;
+  }
+};
+
+const initUserCache = (user) => {
+  try {
+  const cache = new Map();
+  _populateUserCache(user, globalCache, cache);
+  return cache;
+  } catch (err) {
+    console.log("Error initializing user cache" + err.message);
+    throw err;
+  }
+  };
+
+const flushUserCache = (cache) => {
+  try{
+    cache.clear();
   } catch (err) {
     console.log('Error flushing user cache' + err.message );
     throw err;
   }
 }
 
-module.exports = { initGlobalCache };
+const getReadNews = (user) => {
+  try {
+    const readNews = [];
+    user.read.forEach( articleId => readNews.push(getNewsById(articleId)));
+    return readNews;
+  } catch(err) {
+    console.log("Error getting read news" + err.message);
+    throw err;
+  }
+}
+
+const getFavoriteNews = (user) => {
+  try {
+    const favoriteNews = [];
+    user.favorite.forEach( articleId => favoriteNews.push(getNewsById(articleId)));
+    return favoriteNews;
+  } catch(err) {
+    console.log("Error getting favorite news" + err.message);
+    throw err;
+  }
+}
+
+const searchNewsByKeyword = (word, globalCache) => {
+  try {
+    const news = new Map();
+    _filterCacheByKeyword(word, globalCache, news);
+    const result = [];
+    news.forEach(article => result.push(article));
+    return result;
+  } catch(err) {
+    console.log("Error searching news by keyword");
+    throw err;
+  }
+}
+
+module.exports = { initGlobalCache, initUserCache, flushUserCache, getReadNews, getFavoriteNews, searchNewsByKeyword };

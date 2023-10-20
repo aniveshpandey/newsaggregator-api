@@ -1,4 +1,4 @@
-const { readUsers, writeUsers } = require("../etc/userFileHelper.js");
+const { readUsers, writeUsers } = require("../etc/fileHelper.js");
 const { User } = require('./user-class.js');
 
 const addUser = (user, path) => {
