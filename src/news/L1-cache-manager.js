@@ -25,7 +25,7 @@ const _fetchDataFromAPI = async (prefs, key, url, maxPage) => {
       const data = await axios.get(url, { params: query });
       if (data.status != 'ok')
         throw new Error ('Invalid data received from API');
-      dataArray.push(data.articles);
+      dataArray = data.articles;
       setTimeout(()=> {}, 1100);
     }
     return dataArray;
@@ -49,11 +49,11 @@ const _populateCache = (cache, prefs, key, url, maxPage) => {
   }
 };
 
-const _flushCache = (cache, expiryDuration) => {
+const _flushCache = (cache, expiryInterval) => {
   try {
     cache.forEach(  (_, key)  => {
       const timeDifference = new Date() - key.fetchedAt;
-      if(timeDifference > expiryDuration)
+      if(timeDifference > expiryInterval)
         cache.delete(key);
     });
   } catch(err) {
@@ -62,39 +62,7 @@ const _flushCache = (cache, expiryDuration) => {
   }
 };
 
-const _filterCacheByKeyword = (word, cache, map) => {
-  for (let [key, article] in cache){
-    if(article.has(word))
-      map.set(key, article);
-  }
-};
-
-const _populateUserCache = (user, globalCache, userCache) => {
-  try {
-    const keywords = user.preference.q;
-    keywords.forEach(word => {
-      _filterCacheByKeyword(word, globalCache, userCache);
-    });
-  } catch(err) {
-    console.log('Error populating user cache' + err.message);
-    throw err;
-  }
-  };
-
-const _getNewsById = (id, cache) => {
-  try {
-    cache.forEach( (article, key) => {
-      if(key.id == id)
-        return article;
-    });
-    throw new Error ("Article with id not found");
-  } catch(err) {
-    console.log("error finding news article by id" + err.message);
-    throw err;
-  }
-};
-
-const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDuration) => {
+const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryInterval) => {
   try{
   let globalPrefs = {};
   eventEmitter.on('userPrefsUpdated', updateGlobalPreferences);
@@ -104,7 +72,7 @@ const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDurati
   _populateCache(cache, globalPrefs, key, url, maxPage);
   eventEmitter.emit('globalCacheInitialized', cache);
   setInterval (() => {
-    _flushCache(cache, expiryDuration);
+    _flushCache(cache, expiryInterval);
     _populateCache(cache, globalPrefs, key, url, maxPage);
   }, refreshInterval);
   } catch (err) {
@@ -113,59 +81,18 @@ const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryDurati
   }
 };
 
-const initUserCache = (user) => {
-  try {
-  const cache = new Map();
-  _populateUserCache(user, globalCache, cache);
-  return cache;
-  } catch (err) {
-    console.log("Error initializing user cache" + err.message);
-    throw err;
-  }
-  };
-
-const flushUserCache = (cache) => {
-  try{
-    cache.clear();
-  } catch (err) {
-    console.log('Error flushing user cache' + err.message );
-    throw err;
-  }
-}
-
-const getReadNews = (user) => {
-  try {
-    const readNews = [];
-    user.read.forEach( articleId => readNews.push(getNewsById(articleId)));
-    return readNews;
-  } catch(err) {
-    console.log("Error getting read news" + err.message);
-    throw err;
-  }
-}
-
-const getFavoriteNews = (user) => {
-  try {
-    const favoriteNews = [];
-    user.favorite.forEach( articleId => favoriteNews.push(getNewsById(articleId)));
-    return favoriteNews;
-  } catch(err) {
-    console.log("Error getting favorite news" + err.message);
-    throw err;
-  }
-}
-
 const searchNewsByKeyword = (word, globalCache) => {
   try {
     const news = new Map();
     _filterCacheByKeyword(word, globalCache, news);
     const result = [];
     news.forEach(article => result.push(article));
+    if (!result)
+      result = _fetchDataFromAPI({q: word}, key, url, 1); 
     return result;
   } catch(err) {
     console.log("Error searching news by keyword");
     throw err;
   }
-}
-
-module.exports = { initGlobalCache, initUserCache, flushUserCache, getReadNews, getFavoriteNews, searchNewsByKeyword };
+};
+module.exports = { initGlobalCache, searchNewsByKeyword };

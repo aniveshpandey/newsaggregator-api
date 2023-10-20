@@ -8,11 +8,6 @@ class Article {
     this.publishedAt = publishedAt;
     this.content = content;
     this.fetchedAt = new Date();
-    this.lastRead = {};
-  }
-  
-  read () {
-    this.lastRead = new Date();
   }
   
   static has(word){
@@ -20,6 +15,15 @@ class Article {
       this.description.toLowerCase().includes(word) ||
       this.content.toLowerCase().includes(word))
   }
+
+  static read() {
+    this.readFlag = true;
+  }
+
+  static favorite() {
+    this.favoriteFlag = true;
+  }
+
 }
 
 module.exports = { Article };
