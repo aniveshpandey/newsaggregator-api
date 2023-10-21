@@ -50,6 +50,7 @@ const initUserCache = (user) => {
   }
  };
 
+//For logout controller which is not implemented yet
 const flushUserCache = (user) => {
   try{
     const cache = readNews(path.join(userCachedb, `${user.email}`))
