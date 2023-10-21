@@ -38,18 +38,18 @@ class User {
     return this._privilege;
   }
 
-  set preferences(prefs){
-    try {
-      if(prefs.q)
-        this._preferences = prefs;
-    } catch (err) {
-      throw new Error('Error updating preferences');
-    }
-  }
-
-  get preferences() {
-    return this._preferences;
-  }
+  // set preferences(prefs){
+  //   try {
+  //     if(prefs.q)
+  //       this._preferences = prefs;
+  //   } catch (err) {
+  //     throw new Error('Error updating preferences');
+  //   }
+  // }
+  //
+  // get preferences() {
+  //   return this._preferences;
+  // }
 }
 
 module.exports = { User };

@@ -1,15 +1,15 @@
+'use strict';
 require('dotenv').config('../../.env');
 const jwtExpiry = eval(process.env.JWT_EXPIRY);
 const jwtSecret = process.env.JWT_SECRET;
 const bcrypt = require('bcrypt');
 const { addUser, findUser, modifyUser } = require('./services/user-manager.js');
-const { User } = require = ('./services/user-class.js');
+const { User } = require('./services/user-class.js');
 const { validationResult } = require('express-validator');
 const path = require('path');
-const userdbPath = path.join(__dirname, '../../db/users');
+const userdbPath = path.join(__dirname, '../../db/users.json');
 const jwt = require('jsonwebtoken');
 const EventEmitter = require('events');
-const { EventEmitter } = require('stream');
 const eventEmitter = new EventEmitter();
 
 const registerUser = (req, res) => {
@@ -84,8 +84,9 @@ const putPreferences = (req, res) => {
 const updateUserReadNews = (req, res) => {
   try {
     const readId = req.params.id;
-    req.user.read.push(readId);
-    const readNews = modifyUser(req.user.email, userdb, 'read', req.user.read);
+    if(!req.user.read.includes(readId))
+      req.user.read.push(readId);
+    const readNews = modifyUser(req.user.email, userdbPath, 'read', req.user.read);
     eventEmitter.emit('readUpdated', req.user, readId);
     res.status(200).send({read: readNews});
   } catch(err) {
@@ -96,10 +97,11 @@ const updateUserReadNews = (req, res) => {
 const updateUserFavoriteNews = (req, res) => {
   try {
     const favoriteId = req.params.id;
-    req.user.favorite.push(favoriteId);
-    const favoriteNews = modifyUser(req.user.email, userdb, 'favorite', req.user.favorite);
+    if(!req.user.favorite.includes(favoriteId))
+      req.user.favorite.push(favoriteId);
+    const favoriteNews = modifyUser(req.user.email, userdbPath, 'favorite', req.user.favorite);
     eventEmitter.emit('favoriteUpdated',  req.user, favoriteId);
-    res.status(200).send({read: favoriteNews});
+    res.status(200).send({favorite: favoriteNews});
   } catch(err) {
     res.status(400).send({error: err.message});
   }

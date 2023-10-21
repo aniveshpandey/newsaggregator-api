@@ -1,4 +1,4 @@
-const { readUsers, writeUsers } = require("../etc/fileHelper.js");
+const { readUsers, writeUsers } = require("../../etc/fileHelper.js");
 const { User } = require('./user-class.js');
 
 const addUser = (user, path) => {
@@ -39,8 +39,9 @@ const modifyUser = (email, path, prop, value) => {
     user[prop] = value;
     user.dateModified = Date.now();
     writeUsers(path, userdb);
-    return user.prop;
+    return user[prop];
   } catch(err){
+    console.log("Error trying to modify user");
     throw new Error(`Error modifying property of ${user} : ${err.message}`);
   }
 };

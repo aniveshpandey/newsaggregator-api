@@ -4,6 +4,7 @@ const axios = require('axios');
 const { globalPreferences, updateGlobalPreferences } = require('./global-preferences.js');
 const { Article } = require('./article-class.js');
 const EventEmitter = require('events');
+const { Console } = require('console');
 const eventEmitter = new EventEmitter();
 
 const _queryFromPrefs = (prefs, key, page) => {
@@ -12,7 +13,11 @@ const _queryFromPrefs = (prefs, key, page) => {
     let string = `${prop}=${prefs[prop].join('+OR+')}&`
     query +=string;
   }
-  const result = `${query}&page=${page}&apiKey=${key}`;
+  let result;
+  if(query)
+    result = `${query}&page=${page}&apiKey=${key}`;
+  else
+    result = `page=${page}&apiKey=${key}`;
   if(result.length > 500)
     throw new Error("Query too long");
   return result;
@@ -25,26 +30,27 @@ const _fetchDataFromAPI = async (prefs, key, url, maxPage) => {
       const data = await axios.get(url, { params: query });
       if (data.status != 'ok')
         throw new Error ('Invalid data received from API');
-      dataArray = data.articles;
-      setTimeout(()=> {}, 1100);
+      dataArray.push(data.articles);
     }
     return dataArray;
  } catch(err) {
-    console.error('Error fetching data' + err.message);
+    console.error('Error fetching data: ' + err.message);
     throw err;
   }
 };
 
-const _populateCache = (cache, prefs, key, url, maxPage) => {
+const _populateCache = async (cache, prefs, key, url, maxPage) => {
   try { 
-    const data = _fetchDataFromAPI(prefs, key, url, maxPage);
+    let data = [];
+    data = await _fetchDataFromAPI(prefs, key, url, maxPage);
+    console.log(data);
     data.forEach(article => {
     const newsArticle = new Article(article);
     const cacheKey = { id: crypto.randomUUID(), fetchedAt:  newsArticle.fetchedAt };
     cache.set(cacheKey, newsArticle);
-  });
+    });
   } catch (err){
-    console.log("Error populating cache" + err.message);
+    console.log("Error populating cache: " + err.message);
     throw err;
   }
 };
@@ -57,7 +63,7 @@ const _flushCache = (cache, expiryInterval) => {
         cache.delete(key);
     });
   } catch(err) {
-    console.log("Error flushing cache" + err.message);
+    console.log("Error flushing cache: " + err.message);
     throw err;
   }
 };
