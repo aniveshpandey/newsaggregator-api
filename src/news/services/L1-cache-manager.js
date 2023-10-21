@@ -7,26 +7,27 @@ const EventEmitter = require('events');
 const { Console } = require('console');
 const eventEmitter = new EventEmitter();
 
-const _queryFromPrefs = (prefs, key, page) => {
-  const query = '';
-  for (let prop in prefs){
-    let string = `${prop}=${prefs[prop].join('+OR+')}&`
-    query +=string;
-  }
-  let result;
-  if(query)
-    result = `${query}&page=${page}&apiKey=${key}`;
-  else
-    result = `page=${page}&apiKey=${key}`;
-  if(result.length > 500)
-    throw new Error("Query too long");
-  return result;
-};
-
+// const _queryFromPrefs = (prefs, key, page) => {
+//   const query = '';
+//   for (let prop in prefs){
+//     let string = `${prop}=${prefs[prop].join('+OR+')}&`
+//     query +=string;
+//   }
+//   let result;
+//   if(query)
+//     result = `${query}&page=${page}&apiKey=${key}`;
+//   else
+//     result = `page=${page}&apiKey=${key}`;
+//   if(result.length > 500)
+//     throw new Error("Query too long");
+//   return result;
+// };
+//
 const _fetchDataFromAPI = async (prefs, key, url, maxPage) => {
   try{ const dataArray = [];
     for (let i = 1 ; i <= maxPage; i++){
-      const query = _queryFromPrefs(prefs, key, i);
+      const query = prefs;
+      query.apiKey = key;
       const data = await axios.get(url, { params: query });
       if (data.status != 'ok')
         throw new Error ('Invalid data received from API');
@@ -69,22 +70,24 @@ const _flushCache = (cache, expiryInterval) => {
 };
 
 const initGlobalCache = (cache, key, url, maxPage, refreshInterval, expiryInterval) => {
-  try{
-  let globalPrefs = {};
-  eventEmitter.on('userPrefsUpdated', updateGlobalPreferences);
   eventEmitter.on('globalPrefsUpdated', (globalPreferences) => {
     globalPrefs = globalPreferences;
-  });
-  _populateCache(cache, globalPrefs, key, url, maxPage);
-  eventEmitter.emit('globalCacheInitialized', cache);
-  setInterval (() => {
-    _flushCache(cache, expiryInterval);
-    _populateCache(cache, globalPrefs, key, url, maxPage);
-  }, refreshInterval);
+    try{
+      let globalPrefs = {};
+       eventEmitter.on('userPrefsUpdated', updateGlobalPreferences);
+  
+       _populateCache(cache, globalPrefs, key, url, maxPage);
+        eventEmitter.emit('globalCacheInitialized', cache);
+        setInterval (() => {
+        _flushCache(cache, expiryInterval);
+        _populateCache(cache, globalPrefs, key, url, maxPage);
+       }, refreshInterval);
   } catch (err) {
     console.log('Error initializing Global Cache' + err.message);
     throw err;
   }
+  });
+  
 };
 
 const searchNewsByKeyword = (word, globalCache) => {
