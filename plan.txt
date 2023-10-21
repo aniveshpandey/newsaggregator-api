@@ -1,0 +1,51 @@
+API Endpoints
+
+--Required
+
+POST /register
+POST /login
+
+GET /preferences
+PUT /preferences
+GET /news
+
+-Login using bcrypt and jwt
+-To be processed and filtered asynchronously
+-Error handling for invalid requests, authentication and authorization
+-Input validation for user registration and news preferences
+
+--Optional
+
+-caching mechanism asynchronously
+-Endpoints
+
+POST /news/:id/read
+POST /news/:id/favorite
+
+GET /new/read
+GET /news/favorite
+
+GET /news/search/:keyword
+
+-update cache periodically in background
+-Test script
+------------------------------------------------------------------------------------------------------------------------------------------
+1. Find the API Sources - Decided on using NewsAPI
+2. Learn to implement login token with jwt 
+3. Learn mongoDB - learning mongoose for Object Data Modeling - The project mentions it needs in-memory data Structure
+:
+
+4. Learn node-cache or any in-memory alternative
+5. read jq manual for writing test script
+
+Project Structure:
+  src/ 
+      -router.js 
+      -controller.js 
+      -caching-logic.js 
+      -database.js 
+      -fetch-logic.js
+      -validator.js
+
+
+

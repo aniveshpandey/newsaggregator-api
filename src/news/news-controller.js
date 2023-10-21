@@ -7,8 +7,8 @@ const maxPage = eval(process.env.MAX_CACHE_PAGE);
 const refreshInterval = eval(process.env.CACHE_REFRESH_INTERVAL);
 const expiryInterval = eval(process.env.CACHE_EXPIRY_INTERVAL);
 const { validationResult } = require('express-validator');
-const { initGlobalCache, searchNewsByKeyword } = require("./L1-cache-manager");
-const { initUserCache, getUserReadNews, getUserFavoriteNews } = require("./L2-cache-manager");
+const { initGlobalCache, searchNewsByKeyword } = require("./services/L1-cache-manager.js");
+const { initUserCache, getUserReadNews, getUserFavoriteNews } = require("./services/L2-cache-manager.js");
 const globalCache = new Map();
 const userCache = {};
 

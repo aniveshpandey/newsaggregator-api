@@ -1,9 +1,5 @@
-plan.txt
-
 node_modules/
 
-db/users
-
-testscript.sh
+db/users.json
 
 .env
