@@ -4,6 +4,7 @@ const express = require('express');
 const { checkSchema, body } = require('express-validator');
 const app = express();
 const rateLimit = require('express-rate-limit');
+const morgan = require('morgan');
 const { userSchema } = require('./etc/schema.js');
 const { registerUser, loginUser, verifyUser, getPreferences, putPreferences ,updateUserReadNews, updateUserFavoriteNews } = require('./user/user-controller.js');
 const { getUserNews, getReadNews, getFavoriteNews, searchNews} = require('./news/news-controller.js');
@@ -16,6 +17,7 @@ const limiter = rateLimit({
 
 app.use(express.json());
 app.use(limiter);
+app.use(morgan('dev'));
 
 app.get('/', (req,res) =>{
   res.status(200).send("News Aggregator API");
