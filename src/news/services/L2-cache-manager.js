@@ -1,5 +1,5 @@
 'use strict';
-const { readNews, writeNews } = require('../../etc/fileHelper.js');
+const { readNews, writeNews } = require('../../etc/file-helper.js');
 const path = require('path');
 const userCachedb = path.join((__dirname, '../../db/newsdb/'));
 const { _fetchDataFromAPI } = require('./L1-cache-manager.js');
