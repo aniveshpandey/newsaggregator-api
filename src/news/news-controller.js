@@ -25,6 +25,8 @@ const getUserNews = (req, res) => {
   try {
     const user = req.user;
     const cache = userCache[user];
+    if(!cache)
+      throw new Error('User Cache not availible');
     res.status(200).send({articles: cache});
   } catch(err){
     res.status(400).send({ message: "Error getting user news", error: err.message});
